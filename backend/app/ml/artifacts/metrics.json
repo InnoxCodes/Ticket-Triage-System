@@ -1,0 +1,636 @@
+{
+  "generated_at": "2026-09-12T17:21:27+00:00",
+  "dataset": {
+    "total": 1400,
+    "train": 1120,
+    "test": 280,
+    "source": "tickets.csv"
+  },
+  "environment": {
+    "python": "3.12.4",
+    "scikit_learn": "1.6.1"
+  },
+  "models": {
+    "category": {
+      "labels": [
+        "Billing",
+        "Bug Report",
+        "Login/Access",
+        "Feature Request",
+        "General Inquiry",
+        "Technical Issue"
+      ],
+      "accuracy": 0.9464,
+      "macro_f1": 0.95,
+      "weighted_f1": 0.9463,
+      "baseline_accuracy": 0.2179,
+      "per_class": [
+        {
+          "label": "Billing",
+          "precision": 0.9423,
+          "recall": 1.0,
+          "f1": 0.9703,
+          "support": 49
+        },
+        {
+          "label": "Bug Report",
+          "precision": 0.9153,
+          "recall": 0.9153,
+          "f1": 0.9153,
+          "support": 59
+        },
+        {
+          "label": "Login/Access",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 39
+        },
+        {
+          "label": "Feature Request",
+          "precision": 1.0,
+          "recall": 0.9091,
+          "f1": 0.9524,
+          "support": 33
+        },
+        {
+          "label": "General Inquiry",
+          "precision": 0.9474,
+          "recall": 0.9231,
+          "f1": 0.9351,
+          "support": 39
+        },
+        {
+          "label": "Technical Issue",
+          "precision": 0.9194,
+          "recall": 0.9344,
+          "f1": 0.9268,
+          "support": 61
+        }
+      ],
+      "confusion_matrix": [
+        [
+          49,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          54,
+          0,
+          0,
+          0,
+          5
+        ],
+        [
+          0,
+          0,
+          39,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0,
+          30,
+          2,
+          0
+        ],
+        [
+          3,
+          0,
+          0,
+          0,
+          36,
+          0
+        ],
+        [
+          0,
+          4,
+          0,
+          0,
+          0,
+          57
+        ]
+      ],
+      "top_features": {
+        "Billing": [
+          [
+            "moneyamt",
+            4.2037
+          ],
+          [
+            "invoice",
+            3.0517
+          ],
+          [
+            "payment",
+            2.9642
+          ],
+          [
+            "subscription",
+            2.6889
+          ],
+          [
+            "refnum",
+            2.6847
+          ],
+          [
+            "billed",
+            2.582
+          ],
+          [
+            "active",
+            2.0446
+          ],
+          [
+            "billing",
+            2.0258
+          ]
+        ],
+        "Bug Report": [
+          [
+            "rows",
+            2.351
+          ],
+          [
+            "export",
+            2.144
+          ],
+          [
+            "form",
+            1.8655
+          ],
+          [
+            "console",
+            1.7839
+          ],
+          [
+            "time",
+            1.7525
+          ],
+          [
+            "record",
+            1.7511
+          ],
+          [
+            "silently",
+            1.6692
+          ],
+          [
+            "column",
+            1.55
+          ]
+        ],
+        "Feature Request": [
+          [
+            "would",
+            4.3905
+          ],
+          [
+            "could",
+            3.1839
+          ],
+          [
+            "mode",
+            2.2309
+          ],
+          [
+            "point",
+            2.1354
+          ],
+          [
+            "webhook",
+            2.0028
+          ],
+          [
+            "customers",
+            1.863
+          ],
+          [
+            "slack",
+            1.7665
+          ],
+          [
+            "slack notifications",
+            1.7665
+          ]
+        ],
+        "General Inquiry": [
+          [
+            "data",
+            2.9342
+          ],
+          [
+            "invite",
+            2.6645
+          ],
+          [
+            "teams",
+            2.0475
+          ],
+          [
+            "difference",
+            1.9884
+          ],
+          [
+            "plans",
+            1.9884
+          ],
+          [
+            "numbers",
+            1.9361
+          ],
+          [
+            "numbers shown",
+            1.9361
+          ],
+          [
+            "should",
+            1.886
+          ]
+        ],
+        "Login/Access": [
+          [
+            "login",
+            2.6789
+          ],
+          [
+            "account",
+            2.5994
+          ],
+          [
+            "access",
+            2.5563
+          ],
+          [
+            "expires",
+            2.3354
+          ],
+          [
+            "code",
+            2.0911
+          ],
+          [
+            "cannot",
+            2.0807
+          ],
+          [
+            "password",
+            2.0127
+          ],
+          [
+            "login page",
+            1.9924
+          ]
+        ],
+        "Technical Issue": [
+          [
+            "requests",
+            2.4122
+          ],
+          [
+            "v2",
+            2.2642
+          ],
+          [
+            "hours",
+            2.1453
+          ],
+          [
+            "v1",
+            2.1066
+          ],
+          [
+            "api",
+            2.0367
+          ],
+          [
+            "sync",
+            2.003
+          ],
+          [
+            "sync failing",
+            1.9661
+          ],
+          [
+            "drop",
+            1.923
+          ]
+        ]
+      },
+      "slices": [
+        {
+          "name": "Labels free of annotator noise",
+          "n": 260,
+          "accuracy": 0.9846
+        }
+      ],
+      "model_selection": {
+        "candidates": [
+          {
+            "model": "Majority baseline",
+            "cv_accuracy": 0.2188,
+            "cv_accuracy_std": 0.0,
+            "cv_macro_f1": 0.0598,
+            "fit_seconds": 0.125
+          },
+          {
+            "model": "Multinomial NB",
+            "cv_accuracy": 0.8955,
+            "cv_accuracy_std": 0.0175,
+            "cv_macro_f1": 0.891,
+            "fit_seconds": 0.091
+          },
+          {
+            "model": "Linear SVM",
+            "cv_accuracy": 0.9491,
+            "cv_accuracy_std": 0.0046,
+            "cv_macro_f1": 0.9484,
+            "fit_seconds": 0.107
+          },
+          {
+            "model": "Logistic Regression",
+            "cv_accuracy": 0.9375,
+            "cv_accuracy_std": 0.0063,
+            "cv_macro_f1": 0.937,
+            "fit_seconds": 0.136
+          }
+        ],
+        "best_params": {
+          "clf__C": "4.0",
+          "tfidf__min_df": "1",
+          "tfidf__ngram_range": "(1, 2)"
+        },
+        "cv_best_score": 0.942
+      }
+    },
+    "urgency": {
+      "labels": [
+        "Critical",
+        "High",
+        "Medium",
+        "Low"
+      ],
+      "accuracy": 0.7321,
+      "macro_f1": 0.7275,
+      "weighted_f1": 0.7323,
+      "baseline_accuracy": 0.3107,
+      "per_class": [
+        {
+          "label": "Critical",
+          "precision": 0.6818,
+          "recall": 0.7317,
+          "f1": 0.7059,
+          "support": 41
+        },
+        {
+          "label": "High",
+          "precision": 0.662,
+          "recall": 0.6528,
+          "f1": 0.6573,
+          "support": 72
+        },
+        {
+          "label": "Medium",
+          "precision": 0.7209,
+          "recall": 0.7126,
+          "f1": 0.7168,
+          "support": 87
+        },
+        {
+          "label": "Low",
+          "precision": 0.8354,
+          "recall": 0.825,
+          "f1": 0.8302,
+          "support": 80
+        }
+      ],
+      "confusion_matrix": [
+        [
+          30,
+          9,
+          0,
+          2
+        ],
+        [
+          7,
+          47,
+          16,
+          2
+        ],
+        [
+          6,
+          10,
+          62,
+          9
+        ],
+        [
+          1,
+          5,
+          8,
+          66
+        ]
+      ],
+      "top_features": {
+        "Critical": [
+          [
+            "incident",
+            1.026
+          ],
+          [
+            "need",
+            1.0118
+          ],
+          [
+            "failing",
+            0.8197
+          ],
+          [
+            "out",
+            0.8087
+          ],
+          [
+            "environment",
+            0.6855
+          ],
+          [
+            "treat",
+            0.6822
+          ],
+          [
+            "request",
+            0.67
+          ],
+          [
+            "returned",
+            0.67
+          ]
+        ],
+        "High": [
+          [
+            "week",
+            0.8791
+          ],
+          [
+            "time not",
+            0.767
+          ],
+          [
+            "day",
+            0.7115
+          ],
+          [
+            "daily",
+            0.6988
+          ],
+          [
+            "people",
+            0.6987
+          ],
+          [
+            "several",
+            0.6437
+          ],
+          [
+            "important",
+            0.6348
+          ],
+          [
+            "eating",
+            0.6329
+          ]
+        ],
+        "Low": [
+          [
+            "else",
+            1.3887
+          ],
+          [
+            "purely",
+            1.171
+          ],
+          [
+            "nothing",
+            1.003
+          ],
+          [
+            "really",
+            0.9883
+          ],
+          [
+            "not blocked",
+            0.8845
+          ],
+          [
+            "far",
+            0.8342
+          ],
+          [
+            "noticed far",
+            0.8342
+          ],
+          [
+            "only noticed",
+            0.8141
+          ]
+        ],
+        "Medium": [
+          [
+            "next",
+            0.9665
+          ],
+          [
+            "up",
+            0.8749
+          ],
+          [
+            "nothing actually",
+            0.763
+          ],
+          [
+            "actually blocked",
+            0.763
+          ],
+          [
+            "now",
+            0.7336
+          ],
+          [
+            "shows",
+            0.7294
+          ],
+          [
+            "shows up",
+            0.6954
+          ],
+          [
+            "actually",
+            0.6643
+          ]
+        ]
+      },
+      "slices": [
+        {
+          "name": "Labels free of annotator noise",
+          "n": 260,
+          "accuracy": 0.7538
+        },
+        {
+          "name": "Reporter stated the impact",
+          "n": 185,
+          "accuracy": 0.9081
+        },
+        {
+          "name": "Impact left implicit",
+          "n": 95,
+          "accuracy": 0.3895
+        }
+      ],
+      "adjacent_accuracy": 0.9429,
+      "model_selection": {
+        "candidates": [
+          {
+            "model": "Majority baseline",
+            "cv_accuracy": 0.3098,
+            "cv_accuracy_std": 0.0022,
+            "cv_macro_f1": 0.1183,
+            "fit_seconds": 0.083
+          },
+          {
+            "model": "Multinomial NB",
+            "cv_accuracy": 0.7214,
+            "cv_accuracy_std": 0.0131,
+            "cv_macro_f1": 0.7108,
+            "fit_seconds": 0.089
+          },
+          {
+            "model": "Linear SVM",
+            "cv_accuracy": 0.7268,
+            "cv_accuracy_std": 0.0186,
+            "cv_macro_f1": 0.719,
+            "fit_seconds": 0.103
+          },
+          {
+            "model": "Logistic Regression",
+            "cv_accuracy": 0.7366,
+            "cv_accuracy_std": 0.0321,
+            "cv_macro_f1": 0.7309,
+            "fit_seconds": 0.118
+          }
+        ],
+        "best_params": {
+          "clf__C": "0.5",
+          "tfidf__min_df": "2",
+          "tfidf__ngram_range": "(1, 2)"
+        },
+        "cv_best_score": 0.7348
+      }
+    }
+  }
+}
