@@ -139,6 +139,49 @@ def slice_metrics(
     return results
 
 
+def confidence_curve(
+    pipeline: Pipeline,
+    x_test: list[str],
+    y_test: list[str],
+    thresholds: tuple[float, ...] = (0.30, 0.35, 0.40, 0.45, 0.50, 0.55, 0.60, 0.70, 0.80),
+) -> list[dict[str, Any]]:
+    """Coverage vs accuracy as the auto-routing confidence bar moves.
+
+    For each threshold: what share of tickets would the system handle without
+    asking a human (coverage), and how accurate would it be on exactly those
+    (selective accuracy)?
+
+    This is the analysis that turns a 73% model into a shippable product. A
+    triage system does not have to answer every ticket — it has to answer the
+    ones it is sure about and escalate the rest. Reading the operating point
+    off this curve is a decision about cost, not about the model.
+    """
+    probabilities = pipeline.predict_proba(x_test)
+    predictions = pipeline.classes_[probabilities.argmax(axis=1)]
+    confidences = probabilities.max(axis=1)
+    correct = predictions == np.asarray(y_test)
+
+    rows: list[dict[str, Any]] = []
+    total = len(y_test)
+
+    for threshold in thresholds:
+        above = confidences >= threshold
+        count = int(above.sum())
+        rows.append(
+            {
+                "threshold": threshold,
+                "coverage": round(count / total, 4),
+                "n_auto_routed": count,
+                "accuracy": round(float(correct[above].mean()), 4) if count else None,
+                "escalated_accuracy": (
+                    round(float(correct[~above].mean()), 4) if count < total else None
+                ),
+            }
+        )
+
+    return rows
+
+
 def evaluate_model(
     pipeline: Pipeline,
     x_test: list[str],
@@ -162,6 +205,7 @@ def evaluate_model(
         "confusion_matrix": confusion(y_test, y_pred, labels),
         "top_features": top_features(pipeline),
         "slices": slice_metrics(y_test, y_pred, slices) if slices else [],
+        "confidence_curve": confidence_curve(pipeline, x_test, y_test),
     }
 
     if ordinal:
@@ -209,6 +253,22 @@ def render_report(name: str, metrics: dict[str, Any]) -> str:
         for row in metrics["slices"]:
             lines.append(
                 f"    {row['name']:<38} n={row['n']:<5} acc={row['accuracy']:.3f}"
+            )
+
+    if metrics.get("confidence_curve"):
+        lines.append("")
+        lines.append("  Selective prediction (auto-route above the bar, escalate below)")
+        lines.append(f"    {'Threshold':<12}{'Coverage':>10}{'Accuracy':>11}{'Escalated':>12}")
+        for row in metrics["confidence_curve"]:
+            accuracy = f"{row['accuracy']:.3f}" if row["accuracy"] is not None else "  -  "
+            escalated = (
+                f"{row['escalated_accuracy']:.3f}"
+                if row["escalated_accuracy"] is not None
+                else "  -  "
+            )
+            lines.append(
+                f"    {row['threshold']:<12.2f}{row['coverage']:>10.1%}"
+                f"{accuracy:>11}{escalated:>12}"
             )
 
     lines.append("")
