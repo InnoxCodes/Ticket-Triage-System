@@ -71,7 +71,6 @@ URGENCY_RANK: dict[str, int] = {
 
 # Target response times per urgency level. Not used by the model at all — this
 # is business policy, surfaced in the UI as an SLA countdown on each card.
-SLA_MINIMUM = 1
 SLA_MINUTES: dict[str, int] = {
     Urgency.CRITICAL: 30,
     Urgency.HIGH: 4 * 60,
