@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-12T17:21:27+00:00",
+  "generated_at": "2026-09-12T17:25:17+00:00",
   "dataset": {
     "total": 1400,
     "train": 1120,
@@ -331,6 +331,71 @@
           "accuracy": 0.9846
         }
       ],
+      "confidence_curve": [
+        {
+          "threshold": 0.3,
+          "coverage": 0.9893,
+          "n_auto_routed": 277,
+          "accuracy": 0.9458,
+          "escalated_accuracy": 1.0
+        },
+        {
+          "threshold": 0.35,
+          "coverage": 0.9714,
+          "n_auto_routed": 272,
+          "accuracy": 0.9485,
+          "escalated_accuracy": 0.875
+        },
+        {
+          "threshold": 0.4,
+          "coverage": 0.9607,
+          "n_auto_routed": 269,
+          "accuracy": 0.9554,
+          "escalated_accuracy": 0.7273
+        },
+        {
+          "threshold": 0.45,
+          "coverage": 0.9321,
+          "n_auto_routed": 261,
+          "accuracy": 0.9579,
+          "escalated_accuracy": 0.7895
+        },
+        {
+          "threshold": 0.5,
+          "coverage": 0.9036,
+          "n_auto_routed": 253,
+          "accuracy": 0.9565,
+          "escalated_accuracy": 0.8519
+        },
+        {
+          "threshold": 0.55,
+          "coverage": 0.875,
+          "n_auto_routed": 245,
+          "accuracy": 0.9592,
+          "escalated_accuracy": 0.8571
+        },
+        {
+          "threshold": 0.6,
+          "coverage": 0.8071,
+          "n_auto_routed": 226,
+          "accuracy": 0.9558,
+          "escalated_accuracy": 0.9074
+        },
+        {
+          "threshold": 0.7,
+          "coverage": 0.6036,
+          "n_auto_routed": 169,
+          "accuracy": 0.9527,
+          "escalated_accuracy": 0.9369
+        },
+        {
+          "threshold": 0.8,
+          "coverage": 0.375,
+          "n_auto_routed": 105,
+          "accuracy": 0.9524,
+          "escalated_accuracy": 0.9429
+        }
+      ],
       "model_selection": {
         "candidates": [
           {
@@ -338,28 +403,28 @@
             "cv_accuracy": 0.2188,
             "cv_accuracy_std": 0.0,
             "cv_macro_f1": 0.0598,
-            "fit_seconds": 0.125
+            "fit_seconds": 0.127
           },
           {
             "model": "Multinomial NB",
             "cv_accuracy": 0.8955,
             "cv_accuracy_std": 0.0175,
             "cv_macro_f1": 0.891,
-            "fit_seconds": 0.091
+            "fit_seconds": 0.113
           },
           {
             "model": "Linear SVM",
             "cv_accuracy": 0.9491,
             "cv_accuracy_std": 0.0046,
             "cv_macro_f1": 0.9484,
-            "fit_seconds": 0.107
+            "fit_seconds": 0.097
           },
           {
             "model": "Logistic Regression",
             "cv_accuracy": 0.9375,
             "cv_accuracy_std": 0.0063,
             "cv_macro_f1": 0.937,
-            "fit_seconds": 0.136
+            "fit_seconds": 0.118
           }
         ],
         "best_params": {
@@ -592,6 +657,71 @@
           "accuracy": 0.3895
         }
       ],
+      "confidence_curve": [
+        {
+          "threshold": 0.3,
+          "coverage": 0.9571,
+          "n_auto_routed": 268,
+          "accuracy": 0.7537,
+          "escalated_accuracy": 0.25
+        },
+        {
+          "threshold": 0.35,
+          "coverage": 0.8071,
+          "n_auto_routed": 226,
+          "accuracy": 0.8274,
+          "escalated_accuracy": 0.3333
+        },
+        {
+          "threshold": 0.4,
+          "coverage": 0.6429,
+          "n_auto_routed": 180,
+          "accuracy": 0.8889,
+          "escalated_accuracy": 0.45
+        },
+        {
+          "threshold": 0.45,
+          "coverage": 0.5321,
+          "n_auto_routed": 149,
+          "accuracy": 0.9329,
+          "escalated_accuracy": 0.5038
+        },
+        {
+          "threshold": 0.5,
+          "coverage": 0.4071,
+          "n_auto_routed": 114,
+          "accuracy": 0.9298,
+          "escalated_accuracy": 0.5964
+        },
+        {
+          "threshold": 0.55,
+          "coverage": 0.3071,
+          "n_auto_routed": 86,
+          "accuracy": 0.9419,
+          "escalated_accuracy": 0.6392
+        },
+        {
+          "threshold": 0.6,
+          "coverage": 0.2286,
+          "n_auto_routed": 64,
+          "accuracy": 0.9219,
+          "escalated_accuracy": 0.6759
+        },
+        {
+          "threshold": 0.7,
+          "coverage": 0.1036,
+          "n_auto_routed": 29,
+          "accuracy": 0.8966,
+          "escalated_accuracy": 0.7131
+        },
+        {
+          "threshold": 0.8,
+          "coverage": 0.0179,
+          "n_auto_routed": 5,
+          "accuracy": 1.0,
+          "escalated_accuracy": 0.7273
+        }
+      ],
       "adjacent_accuracy": 0.9429,
       "model_selection": {
         "candidates": [
@@ -600,28 +730,28 @@
             "cv_accuracy": 0.3098,
             "cv_accuracy_std": 0.0022,
             "cv_macro_f1": 0.1183,
-            "fit_seconds": 0.083
+            "fit_seconds": 0.086
           },
           {
             "model": "Multinomial NB",
             "cv_accuracy": 0.7214,
             "cv_accuracy_std": 0.0131,
             "cv_macro_f1": 0.7108,
-            "fit_seconds": 0.089
+            "fit_seconds": 0.093
           },
           {
             "model": "Linear SVM",
             "cv_accuracy": 0.7268,
             "cv_accuracy_std": 0.0186,
             "cv_macro_f1": 0.719,
-            "fit_seconds": 0.103
+            "fit_seconds": 0.135
           },
           {
             "model": "Logistic Regression",
             "cv_accuracy": 0.7366,
             "cv_accuracy_std": 0.0321,
             "cv_macro_f1": 0.7309,
-            "fit_seconds": 0.118
+            "fit_seconds": 0.151
           }
         ],
         "best_params": {
