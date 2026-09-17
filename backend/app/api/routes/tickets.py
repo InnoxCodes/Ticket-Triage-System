@@ -101,6 +101,7 @@ async def create_ticket(payload: TicketCreate, session: SessionDep) -> TicketDet
 @router.get("", response_model=TicketPage)
 async def list_tickets(
     session: SessionDep,
+    _: CurrentAgent,
     page: Annotated[int, Query(ge=1)] = 1,
     page_size: Annotated[int, Query(ge=1, le=200)] = 100,
     category: str | None = None,
@@ -139,8 +140,13 @@ async def list_tickets(
 
 
 @router.get("/{ticket_id}", response_model=TicketDetail)
-async def get_ticket(ticket_id: int, session: SessionDep) -> TicketDetail:
-    """Full ticket detail, including the model's confidence breakdown."""
+async def get_ticket(ticket_id: int, session: SessionDep, _: CurrentAgent) -> TicketDetail:
+    """Full ticket detail, including the model's confidence breakdown. Agent-only.
+
+    Reads are gated as well as writes: the body and requester email are
+    customer data, and an unauthenticated GET would expose every ticket to
+    anyone who can count upward from id 1.
+    """
     ticket = await ticket_service.get_ticket(session, ticket_id)
     if ticket is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ticket not found")
