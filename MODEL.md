@@ -322,6 +322,24 @@ point the system auto-routes 88% of category decisions at 96% accuracy and
 in the UI. Choosing the point is a cost decision, not a modelling one — the
 curve is what makes it a decision at all rather than a guess.
 
+**A smarter-sounding rule that the data rejected.** On fresh, unseen tickets
+the flat 0.45 cutoff escalates ~66% of tickets (the test split understates
+this), so I tried escalating only when the model cannot tell *urgent*
+(Critical/High) from *not urgent* — on the theory that Medium-vs-Low confusion
+is harmless. Measured on the test split, combined with the category rule:
+
+| Rule | Escalated | Urgent/not-urgent errors caught |
+|---|---|---|
+| flat urgency < 0.40 | 45.7% | 78.6% |
+| **flat urgency < 0.45** | **56.1%** | **88.1%** |
+| P(urgent) in 0.35–0.65 | 54.3% | 76.2% |
+| P(urgent) in 0.30–0.70 | 69.3% | 88.1% |
+
+The band rule escalates as much or more and catches fewer of the expensive
+mistakes, so the flat threshold stays. The high review share is handled in the
+UI instead: low-confidence predictions get a quiet dashed badge and a
+"needs review" filter, not an alarm on every card.
+
 ---
 
 ## 6. What the models actually learned
