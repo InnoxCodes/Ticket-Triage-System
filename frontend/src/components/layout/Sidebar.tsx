@@ -1,11 +1,10 @@
-import { ChartColumnBig, LayoutDashboard, LogOut, Moon, Send, Sun } from "lucide-react";
+import { ChartColumnBig, LayoutDashboard, Moon, Send, Sun } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 import { Logo } from "@/components/ui/Logo";
-import { useAuth } from "@/context/AuthContext";
 import { FALLBACK_POLL_MS, useFeed, type FeedStatus } from "@/context/FeedContext";
 import { useTheme } from "@/context/ThemeContext";
-import { cn, initials } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 const NAV = [
   { to: "/", label: "Queue", short: "Queue", icon: LayoutDashboard, end: true },
@@ -44,7 +43,6 @@ function ThemeButton({ className }: { className?: string }) {
 }
 
 export function Sidebar() {
-  const { agent, logout } = useAuth();
   const { status } = useFeed();
   const feed = FEED_STATE[status];
 
@@ -98,27 +96,6 @@ export function Sidebar() {
             </span>
             <ThemeButton />
           </div>
-
-          {agent && (
-            <div className="flex items-center gap-2.5 rounded-lg px-2 py-1.5">
-              <span className="grid size-8 shrink-0 place-items-center rounded-full bg-linear-to-br from-accent to-cat-technical text-xs font-semibold text-white">
-                {initials(agent.name)}
-              </span>
-              <span className="min-w-0 flex-1 leading-tight">
-                <span className="block truncate text-sm font-medium">{agent.name}</span>
-                <span className="block truncate text-xs text-fg-subtle">{agent.email}</span>
-              </span>
-              <button
-                type="button"
-                onClick={logout}
-                aria-label="Sign out"
-                title="Sign out"
-                className="grid size-7 place-items-center rounded-md text-fg-subtle transition-colors hover:bg-surface-2 hover:text-fg"
-              >
-                <LogOut className="size-4" />
-              </button>
-            </div>
-          )}
         </div>
       </aside>
 

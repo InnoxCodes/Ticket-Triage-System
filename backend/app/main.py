@@ -11,7 +11,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from app.api.routes import analytics, auth, system, tickets, ws
+from app.api.routes import analytics, system, tickets, ws
 from app.config import settings
 from app.core.events import manager
 from app.db.session import dispose_db, init_db
@@ -38,15 +38,12 @@ human review rather than routed silently.
 * `PATCH /api/tickets/{id}` — move status, or override the model (logged)
 * `GET  /api/analytics/summary` — volume, distributions, override reliability
 * `WS   /ws/tickets` — live event feed
-
-Agent endpoints require a bearer token from `POST /api/auth/login`.
 """
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncGenerator[None]:
     """Start-up and shut-down sequence."""
-    settings.validate_for_runtime()
     await init_db()
 
     # Load the model eagerly. A missing artifact is logged as a warning rather
@@ -59,48 +56,12 @@ async def lifespan(_: FastAPI) -> AsyncGenerator[None]:
     except ModelNotTrainedError as exc:
         logger.warning("%s", exc)
 
-    await _seed_agent()
-
     logger.info("%s ready (%s)", settings.app_name, settings.environment)
     yield
 
     await simulator.stop()
     await manager.close_all()
     await dispose_db()
-
-
-async def _seed_agent() -> None:
-    """Create the demo agent if it does not exist yet.
-
-    Runs on every boot so a fresh clone has working login credentials without
-    a separate setup command. Idempotent — an existing account is left alone,
-    including its password, so a changed one is not silently reset.
-    """
-    from sqlalchemy import select
-
-    from app.core.security import hash_password
-    from app.db.models import Agent
-    from app.db.session import SessionLocal
-
-    async with SessionLocal() as session:
-        existing = (
-            await session.execute(
-                select(Agent).where(Agent.email == settings.seed_agent_email)
-            )
-        ).scalar_one_or_none()
-
-        if existing is not None:
-            return
-
-        session.add(
-            Agent(
-                email=settings.seed_agent_email,
-                name=settings.seed_agent_name,
-                password_hash=hash_password(settings.seed_agent_password),
-            )
-        )
-        await session.commit()
-        logger.info("seeded demo agent %s", settings.seed_agent_email)
 
 
 def create_app() -> FastAPI:
@@ -149,7 +110,6 @@ def create_app() -> FastAPI:
     # Everything REST lives under /api; the WebSocket sits at the root so its
     # URL reads as a protocol endpoint rather than a resource.
     app.include_router(system.router, prefix="/api")
-    app.include_router(auth.router, prefix="/api")
     app.include_router(tickets.router, prefix="/api")
     app.include_router(analytics.router, prefix="/api")
     app.include_router(ws.router)

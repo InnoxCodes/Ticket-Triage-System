@@ -82,7 +82,6 @@ class OverrideOut(BaseModel):
     to_value: str
     model_confidence: float
     created_at: datetime
-    agent_name: str | None = None
 
 
 class TicketSummary(BaseModel):

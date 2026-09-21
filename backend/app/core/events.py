@@ -56,7 +56,7 @@ class ConnectionManager:
         return len(self._connections)
 
     async def register(self, websocket: WebSocket) -> None:
-        """Start broadcasting to a socket that is already accepted and authenticated."""
+        """Start broadcasting to a socket that has already been accepted."""
         async with self._lock:
             self._connections.add(websocket)
         logger.info("websocket connected (%d live)", len(self._connections))

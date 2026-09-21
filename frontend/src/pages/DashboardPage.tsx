@@ -29,7 +29,6 @@ import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { UrgencyDot } from "@/components/ui/UrgencyBadge";
-import { useAuth } from "@/context/AuthContext";
 import { FALLBACK_POLL_MS, useFeed } from "@/context/FeedContext";
 import { useUpdateTicket } from "@/hooks/useUpdateTicket";
 import { api } from "@/lib/api";
@@ -121,7 +120,6 @@ function BoardSkeleton() {
 }
 
 export default function DashboardPage() {
-  const { agent } = useAuth();
   const { status: feedStatus } = useFeed();
   const { mutate: updateTicket } = useUpdateTicket();
   const [params, setParams] = useSearchParams();
@@ -231,10 +229,7 @@ export default function DashboardPage() {
     <div className="mx-auto max-w-[1600px] space-y-5 p-4 sm:p-6 lg:p-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-medium text-fg-subtle">
-            {greeting()}
-            {agent ? `, ${agent.name.split(" ")[0]}` : ""}
-          </p>
+          <p className="text-xs font-medium text-fg-subtle">{greeting()}</p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight">Support queue</h1>
         </div>
         <div className="flex flex-wrap items-center gap-2">

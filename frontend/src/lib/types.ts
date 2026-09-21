@@ -22,21 +22,6 @@ export interface TokenContribution {
   weight: number;
 }
 
-// ---- auth -----------------------------------------------------------------
-
-export interface Agent {
-  id: number;
-  email: string;
-  name: string;
-}
-
-export interface TokenResponse {
-  access_token: string;
-  token_type: string;
-  expires_in: number;
-  agent: Agent;
-}
-
 // ---- tickets --------------------------------------------------------------
 
 export interface TicketSummary {
@@ -67,7 +52,6 @@ export interface OverrideRecord {
   to_value: string;
   model_confidence: number;
   created_at: string;
-  agent_name: string | null;
 }
 
 export interface TicketDetail extends TicketSummary {
@@ -259,5 +243,5 @@ export type FeedEvent =
       data: TicketSummary;
     }
   | { type: "stats.invalidated"; timestamp: string; data: { deleted_id?: number } }
-  | { type: "ready"; data: { agent: string } }
+  | { type: "ready"; data: Record<string, never> }
   | { type: "ping"; data: Record<string, never> };

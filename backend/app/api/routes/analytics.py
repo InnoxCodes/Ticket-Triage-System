@@ -1,23 +1,16 @@
-"""Analytics and model-performance routes. Agent-only."""
+"""Analytics and model-performance routes."""
 
 from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, HTTPException, Query, status
 
-from app.api.deps import SessionDep, get_current_agent
+from app.api.deps import SessionDep
 from app.schemas.analytics import AnalyticsSummary, ModelPerformance
 from app.services import analytics_service
 
-# Gated at the router so a new analytics endpoint cannot be added without auth
-# by forgetting a parameter. The summary includes recent override records with
-# ticket references, which is internal operational data.
-router = APIRouter(
-    prefix="/analytics",
-    tags=["analytics"],
-    dependencies=[Depends(get_current_agent)],
-)
+router = APIRouter(prefix="/analytics", tags=["analytics"])
 
 
 @router.get("/summary", response_model=AnalyticsSummary)

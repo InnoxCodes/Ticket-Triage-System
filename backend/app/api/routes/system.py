@@ -6,7 +6,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from sqlalchemy import func, select
 
-from app.api.deps import CurrentAgent, SessionDep
+from app.api.deps import SessionDep
 from app.config import settings
 from app.core.events import manager
 from app.db.models import Ticket
@@ -65,7 +65,7 @@ async def simulator_state() -> SimulatorStateOut:
 
 
 @router.post("/simulator/start", response_model=SimulatorStateOut)
-async def start_simulator(_: CurrentAgent) -> SimulatorStateOut:
+async def start_simulator() -> SimulatorStateOut:
     """Start injecting synthetic tickets so the live feed has traffic."""
     await simulator.start()
     return SimulatorStateOut(
@@ -74,7 +74,7 @@ async def start_simulator(_: CurrentAgent) -> SimulatorStateOut:
 
 
 @router.post("/simulator/stop", response_model=SimulatorStateOut)
-async def stop_simulator(_: CurrentAgent) -> SimulatorStateOut:
+async def stop_simulator() -> SimulatorStateOut:
     """Stop the synthetic ticket generator."""
     await simulator.stop()
     return SimulatorStateOut(

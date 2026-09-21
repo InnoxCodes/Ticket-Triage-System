@@ -2,9 +2,7 @@
 
 Every value has a default that works on a fresh clone with no ``.env`` file,
 because a portfolio project that needs a configuration ritual before it starts
-does not get run. The defaults are development defaults: ``JWT_SECRET`` in
-particular is overridden in any real deployment, and the app refuses to start
-with the placeholder when ``ENVIRONMENT`` is not ``development``.
+does not get run.
 """
 
 from __future__ import annotations
@@ -17,16 +15,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BACKEND_ROOT = Path(__file__).resolve().parent.parent
 
-# Obvious placeholder. Checked against by name so a deployment that forgets to
-# set a real secret fails loudly at boot rather than silently signing tokens
-# anyone can forge.
-DEV_JWT_SECRET = "dev-only-insecure-secret-change-me"
-
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", extra="ignore"
-    )
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     # -- app ---------------------------------------------------------------
     app_name: str = "TriageAI"
@@ -43,18 +34,6 @@ class Settings(BaseSettings):
     # touches one module rather than every route.
     database_url: str = Field(default=f"sqlite+aiosqlite:///{BACKEND_ROOT / 'triageai.db'}")
     db_echo: bool = False
-
-    # -- auth --------------------------------------------------------------
-    jwt_secret: str = Field(default=DEV_JWT_SECRET)
-    jwt_algorithm: str = "HS256"
-    access_token_ttl_minutes: int = 60 * 12
-
-    # Seeded on first boot so the login screen has working credentials. Not a
-    # user-management system — the brief asked for enough auth to gate the
-    # dashboard, and this is exactly that much.
-    seed_agent_email: str = "agent@triageai.dev"
-    seed_agent_password: str = "triage123"
-    seed_agent_name: str = "Alex Morgan"
 
     # -- cors --------------------------------------------------------------
     # The Vite dev server, on both hostnames it answers to.
@@ -85,14 +64,6 @@ class Settings(BaseSettings):
     @property
     def is_production(self) -> bool:
         return self.environment.lower() in {"production", "prod"}
-
-    def validate_for_runtime(self) -> None:
-        """Fail fast on configuration that is unsafe outside development."""
-        if self.is_production and self.jwt_secret == DEV_JWT_SECRET:
-            raise RuntimeError(
-                "JWT_SECRET is still the development placeholder. "
-                "Set a real secret before running in production."
-            )
 
 
 @lru_cache

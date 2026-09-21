@@ -9,7 +9,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Query, Response, status
 
-from app.api.deps import CurrentAgent, SessionDep
+from app.api.deps import SessionDep
 from app.core.events import EventType, manager
 from app.ml.predictor import ModelNotTrainedError, get_model
 from app.schemas.ticket import (
@@ -41,8 +41,7 @@ async def classify(payload: TicketCreate) -> PredictionPreview:
     """Score a ticket without saving it.
 
     Powers the submission form's "Analysing..." step, so a customer sees what
-    the model thinks before committing. Deliberately unauthenticated and
-    side-effect free — it is the public-facing half of the product.
+    the model thinks before committing. Side-effect free.
     """
     try:
         result = get_model().predict(
@@ -71,11 +70,7 @@ async def classify(payload: TicketCreate) -> PredictionPreview:
 
 @router.post("", response_model=TicketDetail, status_code=status.HTTP_201_CREATED)
 async def create_ticket(payload: TicketCreate, session: SessionDep) -> TicketDetail:
-    """Submit a ticket. Classifies inline, stores, then broadcasts.
-
-    Unauthenticated by design: this is the customer's entry point. The agent
-    dashboard behind it is what requires a token.
-    """
+    """Submit a ticket. Classifies inline, stores, then broadcasts."""
     try:
         ticket = await ticket_service.create_ticket(
             session,
@@ -101,7 +96,6 @@ async def create_ticket(payload: TicketCreate, session: SessionDep) -> TicketDet
 @router.get("", response_model=TicketPage)
 async def list_tickets(
     session: SessionDep,
-    _: CurrentAgent,
     page: Annotated[int, Query(ge=1)] = 1,
     page_size: Annotated[int, Query(ge=1, le=200)] = 100,
     category: str | None = None,
@@ -140,13 +134,8 @@ async def list_tickets(
 
 
 @router.get("/{ticket_id}", response_model=TicketDetail)
-async def get_ticket(ticket_id: int, session: SessionDep, _: CurrentAgent) -> TicketDetail:
-    """Full ticket detail, including the model's confidence breakdown. Agent-only.
-
-    Reads are gated as well as writes: the body and requester email are
-    customer data, and an unauthenticated GET would expose every ticket to
-    anyone who can count upward from id 1.
-    """
+async def get_ticket(ticket_id: int, session: SessionDep) -> TicketDetail:
+    """Full ticket detail, including the model's confidence breakdown."""
     ticket = await ticket_service.get_ticket(session, ticket_id)
     if ticket is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ticket not found")
@@ -154,14 +143,11 @@ async def get_ticket(ticket_id: int, session: SessionDep, _: CurrentAgent) -> Ti
 
 
 @router.patch("/{ticket_id}", response_model=TicketDetail)
-async def update_ticket(
-    ticket_id: int, payload: TicketUpdate, session: SessionDep, agent: CurrentAgent
-) -> TicketDetail:
-    """Move a ticket's status, or override the model. Requires authentication.
+async def update_ticket(ticket_id: int, payload: TicketUpdate, session: SessionDep) -> TicketDetail:
+    """Move a ticket's status, or override the model.
 
-    Any change to category or urgency is logged as an override against the
-    signed-in agent — that audit trail is the product's live reliability
-    signal, so the mutation is gated on knowing who made it.
+    Any change to category or urgency is appended to the override log — that
+    audit trail is the product's live reliability signal.
     """
     if not payload.has_changes():
         raise HTTPException(
@@ -179,7 +165,6 @@ async def update_ticket(
         status=payload.status,
         category=payload.category,
         urgency=payload.urgency,
-        agent=agent,
     )
 
     # Re-read so the response carries the newly written override rows.
@@ -203,7 +188,7 @@ async def update_ticket(
     response_model=None,
     response_class=Response,
 )
-async def delete_ticket(ticket_id: int, session: SessionDep, agent: CurrentAgent) -> None:
+async def delete_ticket(ticket_id: int, session: SessionDep) -> None:
     """Delete a ticket and its override history."""
     ticket = await ticket_service.get_ticket(session, ticket_id)
     if ticket is None:

@@ -38,20 +38,12 @@ if str(BACKEND_ROOT) not in sys.path:
 
 from sqlalchemy import delete, func, select  # noqa: E402
 
-from app.config import settings  # noqa: E402
-from app.core.security import hash_password  # noqa: E402
-from app.db.models import Agent, Override, Ticket, TicketStatus  # noqa: E402
+from app.db.models import Override, Ticket, TicketStatus  # noqa: E402
 from app.db.session import SessionLocal, init_db  # noqa: E402
 from app.ml.predictor import warm_up  # noqa: E402
 from app.ml.taxonomy import CATEGORIES, URGENCIES, Urgency  # noqa: E402
 from app.services import ticket_service  # noqa: E402
 from app.services.demo_data import make_ticket  # noqa: E402
-
-# A second agent so the override log has more than one name in it.
-EXTRA_AGENTS = [
-    ("jordan.blake@triageai.dev", "Jordan Blake", "triage123"),
-    ("riya.kapoor@triageai.dev", "Riya Kapoor", "triage123"),
-]
 
 
 def _arrival_time(rng: random.Random, days: int) -> datetime:
@@ -109,24 +101,6 @@ def _resolution_delay(urgency: str, rng: random.Random) -> timedelta:
     return timedelta(hours=max(0.15, hours))
 
 
-async def _ensure_agents(session) -> list[Agent]:
-    """Create the demo agents if absent and return all of them."""
-    wanted = [
-        (settings.seed_agent_email, settings.seed_agent_name, settings.seed_agent_password),
-        *EXTRA_AGENTS,
-    ]
-
-    for email, name, password in wanted:
-        exists = (
-            await session.execute(select(Agent).where(Agent.email == email))
-        ).scalar_one_or_none()
-        if exists is None:
-            session.add(Agent(email=email, name=name, password_hash=hash_password(password)))
-
-    await session.commit()
-    return list((await session.execute(select(Agent))).scalars().all())
-
-
 def _plausible_correction(field: str, current: str, rng: random.Random) -> str:
     """Pick a correction a human would actually make.
 
@@ -156,9 +130,6 @@ async def seed(count: int, days: int, reset: bool, seed_value: int | None) -> No
             await session.execute(delete(Ticket))
             await session.commit()
             print("cleared existing tickets and overrides")
-
-        agents = await _ensure_agents(session)
-        print(f"agents ready: {', '.join(a.email for a in agents)}")
 
         existing = int((await session.execute(select(func.count(Ticket.id)))).scalar_one())
         if existing and not reset:
@@ -207,11 +178,9 @@ async def seed(count: int, days: int, reset: bool, seed_value: int | None) -> No
                 corrected = _plausible_correction(field, current, rng)
 
                 if corrected != current:
-                    agent = rng.choice(agents)
                     session.add(
                         Override(
                             ticket_id=ticket.id,
-                            agent_id=agent.id,
                             field=field,
                             from_value=current,
                             to_value=corrected,
@@ -256,7 +225,6 @@ async def seed(count: int, days: int, reset: bool, seed_value: int | None) -> No
         f"\ndone: {total} tickets total  |  {resolved} resolved  |  "
         f"{flagged} flagged for review  |  {override_count} overrides logged"
     )
-    print(f"login: {settings.seed_agent_email} / {settings.seed_agent_password}")
 
 
 def main() -> None:

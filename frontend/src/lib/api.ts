@@ -1,5 +1,4 @@
 import type {
-  Agent,
   AnalyticsSummary,
   Category,
   Health,
@@ -11,7 +10,6 @@ import type {
   TicketDetail,
   TicketPage,
   TicketUpdate,
-  TokenResponse,
   Urgency,
 } from "./types";
 
@@ -35,25 +33,11 @@ export class ApiError extends Error {
   }
 }
 
-// Module-level so non-React code paths (the query client, the feed socket)
-// share one source of truth for the current session.
-let authToken: string | null = null;
-let unauthorizedHandler: (() => void) | null = null;
-
-export function setAuthToken(token: string | null): void {
-  authToken = token;
-}
-
-export function onUnauthorized(handler: (() => void) | null): void {
-  unauthorizedHandler = handler;
-}
-
 type QueryParams = Record<string, string | number | boolean | null | undefined>;
 
 interface RequestOptions {
   body?: unknown;
   query?: QueryParams;
-  auth?: boolean;
   signal?: AbortSignal;
 }
 
@@ -86,11 +70,10 @@ function toApiError(status: number, payload: unknown): ApiError {
 }
 
 async function request<T>(method: string, path: string, options: RequestOptions = {}): Promise<T> {
-  const { body, query, auth = true, signal } = options;
+  const { body, query, signal } = options;
 
   const headers: Record<string, string> = { Accept: "application/json" };
   if (body !== undefined) headers["Content-Type"] = "application/json";
-  if (auth && authToken) headers.Authorization = `Bearer ${authToken}`;
 
   let response: Response;
   try {
@@ -110,9 +93,6 @@ async function request<T>(method: string, path: string, options: RequestOptions 
   const payload: unknown = await response.json().catch(() => null);
 
   if (!response.ok) {
-    // Only a request that carried a token can mean "your session expired";
-    // a 401 from the login form is just a wrong password.
-    if (response.status === 401 && auth && authToken) unauthorizedHandler?.();
     throw toApiError(response.status, payload);
   }
 
@@ -132,10 +112,7 @@ export type TicketQuery = {
 };
 
 export const api = {
-  login: (email: string, password: string) =>
-    request<TokenResponse>("POST", "/auth/login", { body: { email, password }, auth: false }),
-  me: () => request<Agent>("GET", "/auth/me"),
-  health: () => request<Health>("GET", "/health", { auth: false }),
+  health: () => request<Health>("GET", "/health"),
 
   listTickets: (query: TicketQuery = {}) =>
     request<TicketPage>("GET", "/tickets", { query: { ...query } }),
@@ -146,9 +123,9 @@ export const api = {
   deleteTicket: (id: number) => request<void>("DELETE", `/tickets/${id}`),
 
   createTicket: (payload: TicketCreate) =>
-    request<TicketDetail>("POST", "/tickets", { body: payload, auth: false }),
+    request<TicketDetail>("POST", "/tickets", { body: payload }),
   classify: (payload: TicketCreate, signal?: AbortSignal) =>
-    request<PredictionPreview>("POST", "/tickets/classify", { body: payload, auth: false, signal }),
+    request<PredictionPreview>("POST", "/tickets/classify", { body: payload, signal }),
 
   analytics: (days = 14) =>
     request<AnalyticsSummary>("GET", "/analytics/summary", { query: { days } }),

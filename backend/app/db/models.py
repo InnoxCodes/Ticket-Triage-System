@@ -1,6 +1,6 @@
 """SQLAlchemy ORM models.
 
-Three tables. The shape worth explaining is the split between ``Ticket`` and
+Two tables. The shape worth explaining is the split between ``Ticket`` and
 ``Override``: the ticket carries the *current* category and urgency, while
 every agent correction is also appended to its own row.
 
@@ -46,20 +46,6 @@ def utcnow() -> datetime:
 
 class Base(DeclarativeBase):
     pass
-
-
-class Agent(Base):
-    """A support agent who can log in and work the queue."""
-
-    __tablename__ = "agents"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    email: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
-    name: Mapped[str] = mapped_column(String(120), nullable=False)
-    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
-
-    overrides: Mapped[list[Override]] = relationship(back_populates="agent")
 
 
 class Ticket(Base):
@@ -144,9 +130,6 @@ class Override(Base):
     ticket_id: Mapped[int] = mapped_column(
         ForeignKey("tickets.id", ondelete="CASCADE"), index=True, nullable=False
     )
-    agent_id: Mapped[int | None] = mapped_column(
-        ForeignKey("agents.id", ondelete="SET NULL"), nullable=True
-    )
 
     # "category" or "urgency" — which prediction was corrected.
     field: Mapped[str] = mapped_column(String(20), nullable=False, index=True)
@@ -166,9 +149,8 @@ class Override(Base):
     )
 
     ticket: Mapped[Ticket] = relationship(back_populates="overrides")
-    agent: Mapped[Agent | None] = relationship(back_populates="overrides")
 
 
 # Re-exported so callers can validate against the label space without reaching
 # into the ML package.
-__all__ = ["Agent", "Base", "Category", "Override", "Ticket", "TicketStatus", "Urgency", "utcnow"]
+__all__ = ["Base", "Category", "Override", "Ticket", "TicketStatus", "Urgency", "utcnow"]

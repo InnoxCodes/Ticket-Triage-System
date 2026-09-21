@@ -1,7 +1,6 @@
 # ---- Web framework ----
 fastapi==0.115.6
 uvicorn[standard]==0.34.0
-python-multipart==0.0.20
 
 # ---- Validation / settings ----
 pydantic==2.10.4
@@ -12,10 +11,6 @@ email-validator==2.2.0
 SQLAlchemy==2.0.36
 aiosqlite==0.20.0
 greenlet==3.1.1
-
-# ---- Auth ----
-PyJWT==2.10.1
-bcrypt==4.2.1
 
 # ---- Machine learning ----
 scikit-learn==1.6.1

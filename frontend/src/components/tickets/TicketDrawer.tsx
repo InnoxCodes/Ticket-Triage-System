@@ -335,8 +335,8 @@ function DrawerContent({
                       </span>
                       <div className="min-w-0 leading-relaxed">
                         <p>
-                          <span className="font-medium">{override.agent_name ?? "An agent"}</span>{" "}
-                          <span className="text-fg-muted">changed {override.field}</span>{" "}
+                          <span className="font-medium capitalize">{override.field}</span>{" "}
+                          <span className="text-fg-muted">changed</span>{" "}
                           <span className="text-fg-subtle line-through">{override.from_value}</span>
                           {" → "}
                           <span className="font-medium">{override.to_value}</span>

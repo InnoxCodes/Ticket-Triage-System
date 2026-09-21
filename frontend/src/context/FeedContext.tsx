@@ -11,7 +11,6 @@ import {
 } from "react";
 import { toast } from "sonner";
 
-import { useAuth } from "@/context/AuthContext";
 import { websocketUrl } from "@/lib/api";
 import { queryKeys } from "@/lib/query";
 import type { FeedEvent, TicketPage, TicketSummary } from "@/lib/types";
@@ -24,7 +23,6 @@ export const FALLBACK_POLL_MS = 8_000;
 
 const FRESH_HIGHLIGHT_MS = 6_000;
 const MAX_BACKOFF_MS = 30_000;
-const UNAUTHORIZED_CLOSE_CODE = 4401;
 
 interface FeedContextValue {
   status: FeedStatus;
@@ -57,7 +55,6 @@ function upsertTicket(
 
 export function FeedProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
-  const { token } = useAuth();
 
   const [status, setStatus] = useState<FeedStatus>("connecting");
   const [freshIds, setFreshIds] = useState<ReadonlySet<number>>(() => new Set());
@@ -126,11 +123,6 @@ export function FeedProvider({ children }: { children: ReactNode }) {
   }, [handleEvent]);
 
   useEffect(() => {
-    if (!token) {
-      setStatus("offline");
-      return;
-    }
-
     let socket: WebSocket | null = null;
     let retryTimer: number | undefined;
     let attempt = 0;
@@ -141,8 +133,6 @@ export function FeedProvider({ children }: { children: ReactNode }) {
       setStatus("connecting");
       const current = new WebSocket(websocketUrl("/ws/tickets"));
       socket = current;
-
-      current.onopen = () => current.send(JSON.stringify({ type: "auth", token }));
 
       current.onmessage = (message) => {
         let event: FeedEvent;
@@ -167,15 +157,11 @@ export function FeedProvider({ children }: { children: ReactNode }) {
         handleEventRef.current(event);
       };
 
-      current.onclose = (closeEvent) => {
+      current.onclose = () => {
         if (socket === current) socket = null;
         if (disposed) return;
 
         setStatus("offline");
-        // A rejected token will not start working on retry; the next REST call's
-        // 401 ends the session instead.
-        if (closeEvent.code === UNAUTHORIZED_CLOSE_CODE) return;
-
         const backoff = Math.min(MAX_BACKOFF_MS, 1_000 * 2 ** attempt);
         attempt += 1;
         retryTimer = window.setTimeout(connect, backoff * (0.7 + Math.random() * 0.6));
@@ -189,7 +175,7 @@ export function FeedProvider({ children }: { children: ReactNode }) {
       window.clearTimeout(retryTimer);
       socket?.close();
     };
-  }, [queryClient, token]);
+  }, [queryClient]);
 
   useEffect(() => {
     const timers = freshTimers.current;

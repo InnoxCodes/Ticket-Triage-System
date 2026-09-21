@@ -115,7 +115,3 @@ export const STATUS_META: Record<Status, { dot: string; hint: string }> = {
 };
 
 export const THEME_STORAGE_KEY = "triageai-theme";
-export const TOKEN_STORAGE_KEY = "triageai-token";
-
-// Seeded demo account, shown on the login screen so a reviewer can get straight in.
-export const DEMO_CREDENTIALS = { email: "agent@triageai.dev", password: "triage123" } as const;

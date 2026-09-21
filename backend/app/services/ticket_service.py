@@ -17,7 +17,7 @@ from sqlalchemy import Select, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.db.models import Agent, Override, Ticket, TicketStatus, utcnow
+from app.db.models import Override, Ticket, TicketStatus, utcnow
 from app.ml.predictor import TriageResult, get_model
 from app.ml.taxonomy import sla_minutes, urgency_rank
 
@@ -219,7 +219,7 @@ async def get_ticket(session: AsyncSession, ticket_id: int) -> Ticket | None:
         # selectinload, not lazy loading: a lazy relationship access under
         # asyncio raises MissingGreenlet rather than quietly doing an extra
         # query, so eager loading here is required, not just an optimisation.
-        .options(selectinload(Ticket.overrides).selectinload(Override.agent))
+        .options(selectinload(Ticket.overrides))
     )
     return (await session.execute(statement)).scalar_one_or_none()
 
@@ -236,7 +236,6 @@ async def update_ticket(
     status: str | None = None,
     category: str | None = None,
     urgency: str | None = None,
-    agent: Agent | None = None,
 ) -> tuple[Ticket, list[Override]]:
     """Apply an agent's changes, logging any prediction override.
 
@@ -250,7 +249,6 @@ async def update_ticket(
         logged.append(
             _log_override(
                 ticket,
-                agent,
                 field="category",
                 from_value=ticket.category,
                 to_value=category,
@@ -265,7 +263,6 @@ async def update_ticket(
         logged.append(
             _log_override(
                 ticket,
-                agent,
                 field="urgency",
                 from_value=ticket.urgency,
                 to_value=urgency,
@@ -293,7 +290,6 @@ async def update_ticket(
 
 def _log_override(
     ticket: Ticket,
-    agent: Agent | None,
     *,
     field: str,
     from_value: str,
@@ -303,7 +299,6 @@ def _log_override(
     """Build an override record. Never mutates the ai_* columns."""
     return Override(
         ticket_id=ticket.id,
-        agent_id=agent.id if agent else None,
         field=field,
         from_value=from_value,
         to_value=to_value,
@@ -397,7 +392,6 @@ def to_detail(ticket: Ticket) -> dict[str, Any]:
                     "to_value": o.to_value,
                     "model_confidence": o.model_confidence,
                     "created_at": _as_aware(o.created_at),
-                    "agent_name": o.agent.name if o.agent else None,
                 }
                 for o in ticket.overrides
             ],
