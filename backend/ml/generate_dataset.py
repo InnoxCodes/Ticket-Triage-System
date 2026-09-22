@@ -190,6 +190,18 @@ def compose_ticket(
     category: str, urgency: str, lean: str, *, state_urgency: bool, rng: random.Random
 ) -> str:
     """Assemble one ticket: opener + body + optional impact + detail + closer."""
+    return compose_ticket_parts(category, urgency, lean, state_urgency=state_urgency, rng=rng)[1]
+
+
+def compose_ticket_parts(
+    category: str, urgency: str, lean: str, *, state_urgency: bool, rng: random.Random
+) -> tuple[str, str]:
+    """Assemble one ticket and also return its topical core, as ``(topic, text)``.
+
+    The demo generator uses the clean topic as a subject line. The random
+    draws happen in exactly the order they always have, so the corpus produced
+    from a given seed is byte-for-byte unchanged.
+    """
     body = fill_slots(rng.choice(CATEGORY_TEMPLATES[category][lean]), rng)
 
     if state_urgency:
@@ -218,7 +230,7 @@ def compose_ticket(
     if closer:
         parts.append(closer)
 
-    return " ".join(parts)
+    return body, " ".join(parts)
 
 
 def apply_label_noise(rows: list[dict[str, str]], rng: random.Random) -> None:

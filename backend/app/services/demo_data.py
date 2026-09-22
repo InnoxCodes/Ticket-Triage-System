@@ -18,7 +18,6 @@ stays possible.
 from __future__ import annotations
 
 import random
-import re
 import sys
 from pathlib import Path
 
@@ -32,7 +31,7 @@ from ml.generate_dataset import (  # noqa: E402
     LEAN_URGENCY_PRIOR,
     LEAN_WEIGHTS,
     MISSTATEMENT_RATE,
-    compose_ticket,
+    compose_ticket_parts,
     shift_urgency,
     weighted_choice,
 )
@@ -40,11 +39,6 @@ from ml.noise import add_noise  # noqa: E402
 from ml.templates import CATEGORY_TEMPLATES  # noqa: E402
 
 MAX_SUBJECT_LENGTH = 72
-
-# Leading greetings, stripped before deriving a subject line.
-_GREETING_RE = re.compile(
-    r"^(hi|hello|hey|good morning|dear)\b[^,.!?]*[,.]?\s*", re.IGNORECASE
-)
 
 _REQUESTER_DOMAINS = [
     "northwind.co", "acmelogistics.com", "brightpath.io", "vertexlabs.dev",
@@ -56,25 +50,19 @@ _REQUESTER_NAMES = [
 ]
 
 
-def _derive_subject(body: str) -> str:
-    """Build a plausible subject line from the body's opening clause.
+def _subject_from_topic(topic: str) -> str:
+    """Turn the ticket's clean topical core into a subject line.
 
-    Real reporters write a subject that paraphrases their first sentence, so
-    taking that clause and trimming it produces something that reads right and
-    — importantly — is not identical to the body, which would make the
-    subject+body concatenation the model scores artificially repetitive.
+    Taken from the core *before* noise is applied, because people type subject
+    lines more carefully than bodies. Cutting subjects out of the noisy body
+    instead produced lines like "What HAPPENS to our data ... Logged from our",
+    where casing noise and a dropped full stop leaked into the most visible
+    text on the board.
     """
-    text = _GREETING_RE.sub("", body.strip())
-
-    sentence = re.split(r"(?<=[.!?])\s+", text)[0].strip().rstrip(".!?")
-    if not sentence:
-        sentence = text[:MAX_SUBJECT_LENGTH]
-
-    if len(sentence) > MAX_SUBJECT_LENGTH:
-        cut = sentence[:MAX_SUBJECT_LENGTH].rsplit(" ", 1)[0]
-        sentence = f"{cut}..."
-
-    return sentence[:1].upper() + sentence[1:] if sentence else "Support request"
+    subject = topic.strip().rstrip(".")
+    if len(subject) > MAX_SUBJECT_LENGTH:
+        subject = subject[:MAX_SUBJECT_LENGTH].rsplit(" ", 1)[0].rstrip(",;:") + "…"
+    return subject[:1].upper() + subject[1:]
 
 
 def make_ticket(rng: random.Random) -> tuple[str, str, str]:
@@ -88,16 +76,14 @@ def make_ticket(rng: random.Random) -> tuple[str, str, str]:
     if rng.random() < MISSTATEMENT_RATE:
         urgency = shift_urgency(urgency, rng)
 
-    body = add_noise(
-        compose_ticket(
-            category,
-            urgency,
-            lean,
-            state_urgency=rng.random() >= IMPLICIT_URGENCY_RATE,
-            rng=rng,
-        ),
-        rng,
+    topic, text = compose_ticket_parts(
+        category,
+        urgency,
+        lean,
+        state_urgency=rng.random() >= IMPLICIT_URGENCY_RATE,
+        rng=rng,
     )
+    body = add_noise(text, rng)
 
     email = f"{rng.choice(_REQUESTER_NAMES)}@{rng.choice(_REQUESTER_DOMAINS)}"
-    return _derive_subject(body), body, email
+    return _subject_from_topic(topic), body, email
