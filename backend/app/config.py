@@ -9,9 +9,10 @@ from __future__ import annotations
 
 from functools import lru_cache
 from pathlib import Path
+from typing import Annotated
 
 from pydantic import Field, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 BACKEND_ROOT = Path(__file__).resolve().parent.parent
 
@@ -36,8 +37,13 @@ class Settings(BaseSettings):
     db_echo: bool = False
 
     # -- cors --------------------------------------------------------------
-    # The Vite dev server, on both hostnames it answers to.
-    cors_origins: list[str] = Field(
+    # Defaults cover the Vite dev and preview servers on both hostnames.
+    #
+    # NoDecode is load-bearing. pydantic-settings JSON-decodes list fields read
+    # from the environment, so the comma-separated form every PaaS dashboard
+    # uses ("https://a.app,https://b.app") raised a SettingsError at boot,
+    # before the splitting validator below ever ran.
+    cors_origins: Annotated[list[str], NoDecode] = Field(
         default=[
             "http://localhost:5173",
             "http://127.0.0.1:5173",
@@ -46,8 +52,7 @@ class Settings(BaseSettings):
         ]
     )
 
-    # -- demo data ---------------------------------------------------------
-    seed_ticket_count: int = 60
+    # -- demo --------------------------------------------------------------
     # Background task that injects a ticket every so often, so the live feed
     # has something to show without a human filling in the form. Off by
     # default; the dashboard toggles it through the API.
