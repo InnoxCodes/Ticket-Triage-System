@@ -117,8 +117,14 @@ def _plausible_correction(field: str, current: str, rng: random.Random) -> str:
     return rng.choice([c for c in CATEGORIES if c != current])
 
 
-async def seed(count: int, days: int, reset: bool, seed_value: int | None) -> None:
-    """Create ``count`` tickets spread over the last ``days`` days."""
+async def seed(
+    count: int, days: int, reset: bool, seed_value: int | None, *, if_empty: bool = False
+) -> None:
+    """Create ``count`` tickets spread over the last ``days`` days.
+
+    ``if_empty`` makes seeding safe to run on every container start: a fresh
+    volume gets demo data, and a volume that already holds tickets is left alone.
+    """
     rng = random.Random(seed_value)
 
     await init_db()
@@ -132,6 +138,9 @@ async def seed(count: int, days: int, reset: bool, seed_value: int | None) -> No
             print("cleared existing tickets and overrides")
 
         existing = int((await session.execute(select(func.count(Ticket.id)))).scalar_one())
+        if if_empty and existing:
+            print(f"{existing} tickets already present; skipping seed")
+            return
         if existing and not reset:
             print(f"{existing} tickets already present; adding {count} more")
 
@@ -233,9 +242,12 @@ def main() -> None:
     parser.add_argument("--days", type=int, default=14, help="spread over this many days")
     parser.add_argument("--reset", action="store_true", help="delete existing tickets first")
     parser.add_argument("--seed", type=int, default=7, help="random seed")
+    parser.add_argument(
+        "--if-empty", action="store_true", help="only seed when the database has no tickets"
+    )
     args = parser.parse_args()
 
-    asyncio.run(seed(args.n, args.days, args.reset, args.seed))
+    asyncio.run(seed(args.n, args.days, args.reset, args.seed, if_empty=args.if_empty))
 
 
 if __name__ == "__main__":

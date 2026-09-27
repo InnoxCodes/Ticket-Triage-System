@@ -1,0 +1,26 @@
+name: triageai
+
+services:
+  api:
+    build: ./backend
+    environment:
+      DATABASE_URL: sqlite+aiosqlite:////data/triageai.db
+      CORS_ORIGINS: http://localhost:8080
+      SEED_TICKETS: "80"
+    ports:
+      - "8000:8000" # exposed for the interactive docs at http://localhost:8000/docs
+    volumes:
+      - triageai-data:/data
+    restart: unless-stopped
+
+  web:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  triageai-data:
