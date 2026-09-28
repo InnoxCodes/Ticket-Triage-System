@@ -1,3 +1,4 @@
+import { useReducedMotion } from "framer-motion";
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 import { ChartTooltip } from "@/components/analytics/ChartTooltip";
@@ -6,6 +7,8 @@ import type { CountBucket, Urgency } from "@/lib/types";
 
 export function UrgencyBars({ data }: { data: CountBucket[] }) {
   const colors = useChartColors();
+  // Honour the OS reduce-motion setting: charts render at their final state.
+  const animate = !useReducedMotion();
 
   return (
     <div className="h-56">
@@ -26,7 +29,7 @@ export function UrgencyBars({ data }: { data: CountBucket[] }) {
             tick={{ fill: colors.subtle, fontSize: 11 }}
           />
           <Tooltip cursor={{ fill: colors.surface2 }} content={<ChartTooltip />} />
-          <Bar dataKey="count" name="Tickets" radius={[6, 6, 2, 2]} maxBarSize={56}>
+          <Bar dataKey="count" name="Tickets" radius={[6, 6, 2, 2]} maxBarSize={56} isAnimationActive={animate}>
             {data.map((bucket) => (
               <Cell key={bucket.label} fill={colors.urgency[bucket.label as Urgency]} />
             ))}

@@ -1,3 +1,4 @@
+import { useReducedMotion } from "framer-motion";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
 import { ChartTooltip } from "@/components/analytics/ChartTooltip";
@@ -8,6 +9,8 @@ import { cn, formatPercent } from "@/lib/utils";
 
 export function CategoryDonut({ data }: { data: CountBucket[] }) {
   const colors = useChartColors();
+  // Honour the OS reduce-motion setting: charts render at their final state.
+  const animate = !useReducedMotion();
   const total = data.reduce((sum, bucket) => sum + bucket.count, 0);
   const ranked = [...data].sort((a, b) => b.count - a.count);
 
@@ -27,6 +30,7 @@ export function CategoryDonut({ data }: { data: CountBucket[] }) {
               startAngle={90}
               endAngle={-270}
               stroke="none"
+              isAnimationActive={animate}
             >
               {data.map((bucket) => (
                 <Cell key={bucket.label} fill={colors.category[bucket.label as Category]} />

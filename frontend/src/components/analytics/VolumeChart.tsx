@@ -1,3 +1,4 @@
+import { useReducedMotion } from "framer-motion";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 import { ChartTooltip } from "@/components/analytics/ChartTooltip";
@@ -18,6 +19,8 @@ const formatDay = (date: string | number) =>
 
 export function VolumeChart({ data }: { data: TimeBucket[] }) {
   const colors = useChartColors();
+  // Honour the OS reduce-motion setting: charts render at their final state.
+  const animate = !useReducedMotion();
   // Stack least severe at the bottom so Critical sits on top, where the eye lands first.
   const layers = [...URGENCIES].reverse();
 
@@ -64,6 +67,7 @@ export function VolumeChart({ data }: { data: TimeBucket[] }) {
                 stroke={colors.urgency[urgency]}
                 strokeWidth={1.5}
                 fill={`url(#volume-${urgency})`}
+                isAnimationActive={animate}
               />
             ))}
           </AreaChart>

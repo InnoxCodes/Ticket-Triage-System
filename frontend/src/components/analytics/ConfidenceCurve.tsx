@@ -1,3 +1,4 @@
+import { useReducedMotion } from "framer-motion";
 import { CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 import { ChartTooltip } from "@/components/analytics/ChartTooltip";
@@ -9,6 +10,8 @@ const percent = (value: number) => formatPercent(value);
 
 export function ConfidenceCurve({ curve, threshold }: { curve: ConfidencePoint[]; threshold: number }) {
   const colors = useChartColors();
+  // Honour the OS reduce-motion setting: charts render at their final state.
+  const animate = !useReducedMotion();
 
   const series = [
     { key: "accuracy", name: "Accuracy on auto-routed", color: colors.accent, dashed: false },
@@ -20,7 +23,7 @@ export function ConfidenceCurve({ curve, threshold }: { curve: ConfidencePoint[]
     <div>
       <div className="h-56">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={curve} margin={{ top: 14, right: 12, bottom: 0, left: -12 }}>
+          <LineChart data={curve} margin={{ top: 14, right: 12, bottom: 0, left: 0 }}>
             <CartesianGrid vertical={false} stroke={colors.line} strokeDasharray="3 4" />
             <XAxis
               dataKey="threshold"
@@ -37,7 +40,7 @@ export function ConfidenceCurve({ curve, threshold }: { curve: ConfidencePoint[]
               tickFormatter={percent}
               tickLine={false}
               axisLine={false}
-              width={44}
+              width={48}
               tick={{ fill: colors.subtle, fontSize: 10.5 }}
             />
             <Tooltip
@@ -68,6 +71,7 @@ export function ConfidenceCurve({ curve, threshold }: { curve: ConfidencePoint[]
                 dot={{ r: 2.5, strokeWidth: 0, fill: line.color }}
                 activeDot={{ r: 4 }}
                 connectNulls
+                isAnimationActive={animate}
               />
             ))}
           </LineChart>
