@@ -9,7 +9,7 @@ email-validator==2.2.0
 
 # ---- Persistence (async SQLite via SQLAlchemy 2.0) ----
 SQLAlchemy==2.0.36
-aiosqlite==0.20.0
+aiosqlite==0.22.1
 greenlet==3.1.1
 
 # ---- Machine learning ----
