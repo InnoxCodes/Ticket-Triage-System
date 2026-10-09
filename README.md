@@ -1,5 +1,9 @@
 # TriageAI
 
+[![backend](https://github.com/InnoxCodes/Ticket-Triage-System/actions/workflows/backend-ci.yml/badge.svg)](https://github.com/InnoxCodes/Ticket-Triage-System/actions/workflows/backend-ci.yml)
+[![frontend](https://github.com/InnoxCodes/Ticket-Triage-System/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/InnoxCodes/Ticket-Triage-System/actions/workflows/frontend-ci.yml)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 **Support tickets, classified and routed the moment they arrive, with the model's confidence and reasoning in plain view.**
 
 TriageAI reads each incoming support ticket, predicts **what it's about** (six categories) and **how urgent it is** (four levels), and drops it into a live Kanban queue. When the model isn't sure, it says so and flags the ticket for a human rather than routing it blindly. Every agent correction is logged, and that log becomes a live measure of how far to trust the model.
@@ -122,11 +126,12 @@ make lint      # ruff + TypeScript type-check
 
 ## Deploying
 
-The repo ships with configs for a split deployment. Neither is deployed yet.
-
-**API on Railway.** Create a service from the `backend/` directory (it picks up `railway.json` and the Dockerfile). Attach a volume at `/data` so the SQLite file survives redeploys, and set `CORS_ORIGINS` to the frontend's URL (comma-separated if there's more than one). Keep one replica, because the live-event hub is in-process.
-
-**Frontend on Vercel.** Import the repo with `frontend/` as the root directory (`vercel.json` handles SPA routing and asset caching), and set `VITE_API_URL` to the Railway URL before building.
+The repo ships with configs for a split deployment (API on Railway, frontend
+on Vercel) and a `docker-compose.yml` for running the whole stack locally in
+containers. Neither cloud deploy is live yet — see
+[DEPLOYMENT.md](DEPLOYMENT.md) for the full walkthrough, required environment
+variables, and how to verify the two services are actually talking to each
+other once deployed.
 
 ## Project structure
 
@@ -172,6 +177,10 @@ Interactive docs are served at `/docs` when the API is running.
 - **Frontend tests.** Component tests with Vitest and an end-to-end Playwright run of submit → live arrival → override.
 - **Bundle size.** The main chunk is about 580 KB before gzip. Splitting vendor code and lazy-loading the ticket drawer would cut first load.
 - **CI.** A pipeline running lint, type-check, tests and a Docker build on every push.
+
+## More docs
+
+[ARCHITECTURE.md](ARCHITECTURE.md) · [MODEL.md](MODEL.md) · [DEPLOYMENT.md](DEPLOYMENT.md) · [CONTRIBUTING.md](CONTRIBUTING.md) · [CHANGELOG.md](CHANGELOG.md)
 
 ## License
 
