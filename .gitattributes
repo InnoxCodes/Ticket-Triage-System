@@ -1,0 +1,9 @@
+# Normalize line endings so a Windows checkout doesn't turn every file into a diff.
+* text=auto eol=lf
+
+# Trained pipelines are binary; never let git attempt a text diff on them.
+*.joblib binary
+
+# Keep screenshots and the favicon out of language/diff stats on GitHub.
+*.png binary
+*.svg linguist-generated=true
