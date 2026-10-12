@@ -4,6 +4,8 @@
 [![frontend](https://github.com/InnoxCodes/Ticket-Triage-System/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/InnoxCodes/Ticket-Triage-System/actions/workflows/frontend-ci.yml)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
+**Live demo: https://triage-ai-psi.vercel.app**
+
 **Support tickets, classified and routed the moment they arrive, with the model's confidence and reasoning in plain view.**
 
 TriageAI reads each incoming support ticket, predicts **what it's about** (six categories) and **how urgent it is** (four levels), and drops it into a live Kanban queue. When the model isn't sure, it says so and flags the ticket for a human rather than routing it blindly. Every agent correction is logged, and that log becomes a live measure of how far to trust the model.
