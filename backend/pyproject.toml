@@ -28,3 +28,15 @@ filterwarnings = [
     "ignore:The anyio.abc.BlockingPortal alias is deprecated:DeprecationWarning",
 ]
 addopts = "-q --strict-markers"
+
+[tool.coverage.run]
+source = ["app", "ml", "scripts"]
+omit = ["app/ml/artifacts/*"]
+
+[tool.coverage.report]
+# Defensive branches (a malformed stored hash, an unreachable pool exhaustion
+# guard) are excluded on purpose — they exist for safety, not to be exercised.
+exclude_also = [
+    "if __name__ == .__main__.:",
+    "raise NotImplementedError",
+]

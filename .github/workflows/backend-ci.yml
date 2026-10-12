@@ -36,4 +36,4 @@ jobs:
       # The trained pipelines are committed (see MODEL.md), so tests run
       # against the real artifacts — no training step needed in CI.
       - name: Test
-        run: python -m pytest
+        run: python -m pytest --cov --cov-report=term-missing
