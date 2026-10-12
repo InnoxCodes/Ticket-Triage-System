@@ -89,3 +89,5 @@ logs/
 # immediately after clone without a training step. See MODEL.md.
 # Only transient training scratch output is ignored:
 backend/ml/scratch/
+
+.vercel

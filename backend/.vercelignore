@@ -1,0 +1,10 @@
+.venv
+.venv313
+.pytest_cache
+.ruff_cache
+.coverage
+__pycache__
+*.db
+*.db-*
+tests
+data
