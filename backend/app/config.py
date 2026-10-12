@@ -7,6 +7,7 @@ does not get run.
 
 from __future__ import annotations
 
+import os
 from functools import lru_cache
 from pathlib import Path
 from typing import Annotated
@@ -15,6 +16,9 @@ from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 BACKEND_ROOT = Path(__file__).resolve().parent.parent
+
+# Serverless hosts mount the deployment read-only; /tmp is the one writable path.
+_DB_FILE = Path("/tmp/triageai.db") if os.environ.get("VERCEL") else BACKEND_ROOT / "triageai.db"
 
 
 class Settings(BaseSettings):
@@ -33,7 +37,7 @@ class Settings(BaseSettings):
     # genuinely clone-and-run. The async driver keeps the API non-blocking,
     # and everything goes through a service layer so swapping the store later
     # touches one module rather than every route.
-    database_url: str = Field(default=f"sqlite+aiosqlite:///{BACKEND_ROOT / 'triageai.db'}")
+    database_url: str = Field(default=f"sqlite+aiosqlite:///{_DB_FILE}")
     db_echo: bool = False
 
     # -- cors --------------------------------------------------------------
