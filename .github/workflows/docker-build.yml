@@ -19,7 +19,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # Build-only, no push: this exists to catch a broken Dockerfile before
       # it reaches Railway/Vercel, not to publish an image anywhere.
