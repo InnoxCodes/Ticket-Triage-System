@@ -15,11 +15,14 @@ See the [README](README.md) for the full local-setup walkthrough and
 ## Before opening a PR
 
 ```bash
-make lint   # ruff (backend) + ESLint + tsc (frontend)
-make test   # backend pytest suite
+make lint       # ruff (backend) + ESLint + tsc (frontend)
+make test       # backend pytest suite
+make coverage   # same suite, with a per-file coverage report
 ```
 
-Both also run in CI (`.github/workflows/`) on every push and PR.
+All three also run in CI (`.github/workflows/`) on every push and PR — lint
+and test as gates, coverage as a visible report rather than an enforced
+threshold.
 
 ## Changing the ML pipeline
 
