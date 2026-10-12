@@ -1,4 +1,4 @@
-.PHONY: help install dataset train seed api web test lint build up down
+.PHONY: help install dataset train seed api web test coverage lint build up down
 
 BACKEND := backend
 FRONTEND := frontend
@@ -28,9 +28,12 @@ web: ## Run the Vite dev server on :5173 (proxies /api and /ws to :8000)
 test: ## Run the backend test suite
 	cd $(BACKEND) && .venv/bin/python -m pytest
 
-lint: ## Lint the backend and type-check the frontend
+coverage: ## Run the backend suite with a coverage report
+	cd $(BACKEND) && .venv/bin/python -m pytest --cov --cov-report=term-missing
+
+lint: ## Lint + type-check both apps (ruff, ESLint, tsc)
 	cd $(BACKEND) && .venv/bin/ruff check app ml scripts tests
-	cd $(FRONTEND) && npx tsc -b
+	cd $(FRONTEND) && npm run lint && npx tsc -b
 
 build: ## Production build of the frontend
 	cd $(FRONTEND) && npm run build
